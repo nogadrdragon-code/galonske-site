@@ -1,0 +1,38 @@
+# ════════════════════════════════════════════════════════════════
+#  netlify.toml — Configuration sécurité du site Cédric Galonské
+#
+#  Ce fichier va à la RACINE du dossier de déploiement (à côté
+#  d'index.html). Il fait deux choses :
+#    1. Active l'authentification serveur sur TOUTES les pages.
+#    2. Applique les en-têtes de sécurité à chaque réponse.
+#
+#  ⚠️  Avec ce fichier, n'utilise PLUS l'ancien fichier "_headers"
+#      (les en-têtes sont désormais gérés ici, pour éviter les doublons).
+# ════════════════════════════════════════════════════════════════
+
+# ── 1. Authentification serveur (edge function) ──────────────────
+[[edge_functions]]
+  path = "/*"
+  function = "auth"
+
+# ── 2. En-têtes de sécurité, appliqués à toutes les routes ───────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Empêche d'afficher le site dans une iframe ailleurs (anti-clickjacking)
+    X-Frame-Options = "SAMEORIGIN"
+    # Empêche le navigateur de « deviner » le type d'un fichier
+    X-Content-Type-Options = "nosniff"
+    # Limite les infos transmises aux autres sites
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Désactive des fonctionnalités sensibles non utilisées
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+    # Force le HTTPS pendant 2 ans
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    # Isole le site des autres fenêtres/onglets
+    Cross-Origin-Opener-Policy = "same-origin"
+    # Politique de sécurité du contenu : seules ces sources sont autorisées.
+    # 'unsafe-inline' reste nécessaire tant que le CSS et le JS sont écrits
+    # dans index.html. En les déplaçant dans style.css / script.js, tu
+    # pourras le retirer et durcir encore cette règle.
+    Content-Security-Policy = "default-src 'self'; img-src 'self' https://cedricgalonske.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; object-src 'none'"

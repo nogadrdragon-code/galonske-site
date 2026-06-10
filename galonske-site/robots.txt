@@ -1,0 +1,3 @@
+# Site en accès privé : on interdit l'indexation par tous les moteurs.
+User-agent: *
+Disallow: /
