@@ -1,3 +1,6 @@
+[build]
+  base    = "galonske-site"
+  publish = "galonske-site"
 # ════════════════════════════════════════════════════════════════
 #  netlify.toml — Configuration sécurité du site Cédric Galonské
 #
