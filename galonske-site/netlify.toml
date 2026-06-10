@@ -1,5 +1,3 @@
-[build]
-  publish = "."
 # ════════════════════════════════════════════════════════════════
 #  netlify.toml — Configuration sécurité du site Cédric Galonské
 #
