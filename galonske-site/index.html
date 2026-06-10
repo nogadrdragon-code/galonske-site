@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Site en accès privé : on demande aux moteurs de NE PAS l'indexer -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Cédric Galonské — Communication & Image</title>
+
+  <!-- POLICES : Fraunces (titres) · Inter (texte) · IBM Plex Mono (datelines) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=IBM+Plex+Mono:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══ 1 · TOKENS ═══════════════════════════════════════ */
+    :root {
+      --paper:    #faf8f3;
+      --paper-2:  #f1ede4;
+      --ink:      #15130e;
+      --ink-soft: #6e6a61;
+      --line:     #ddd8cc;
+      --or:       #9c7b4d;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans:  'Inter', system-ui, -apple-system, sans-serif;
+      --mono:  'IBM Plex Mono', ui-monospace, monospace;
+      --pad-x: clamp(24px, 6vw, 80px);
+      --pad-y: clamp(80px, 10vw, 150px);
+    }
+
+    /* ═══ 2 · RESET & BASE ═════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans); background: var(--paper); color: var(--ink);
+      font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a   { text-decoration: none; color: inherit; }
+
+    a:focus-visible, button:focus-visible,
+    input:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--or); outline-offset: 3px;
+    }
+
+    .skip {
+      position: absolute; left: -999px; top: 0; z-index: 999;
+      background: var(--ink); color: var(--paper); padding: 12px 20px; font-size: 13px;
+    }
+    .skip:focus { left: 12px; top: 12px; }
+
+    .eyebrow {
+      font-family: var(--mono); font-size: 12px; font-weight: 400;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--or);
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--or); display: inline-block; }
+
+    /* ═══ 3 · NAVBAR ═══════════════════════════════════════ */
+    .nav {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--pad-x); height: 76px; background: transparent;
+      transition: background 0.4s ease, border-color 0.4s ease, height 0.4s ease;
+      border-bottom: 0.5px solid transparent;
+    }
+    .nav--solid {
+      background: rgba(250, 248, 243, 0.88);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom: 0.5px solid var(--line); height: 64px;
+    }
+    .nav-logo { font-family: var(--serif); font-size: 19px; font-weight: 400; letter-spacing: 0.02em; }
+
+    .nav-links { display: flex; gap: 38px; list-style: none; align-items: center; }
+    .nav-links a {
+      font-size: 13px; letter-spacing: 0.04em; color: var(--ink-soft);
+      position: relative; padding-bottom: 3px; transition: color 0.2s;
+    }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; bottom: 0;
+      width: 0; height: 1px; background: var(--or); transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Groupe de droite : sélecteur de langue + bouton contact + burger */
+    .nav-right { display: flex; align-items: center; gap: 22px; }
+
+    /* Sélecteur de langue EN / FR */
+    .lang-toggle { display: inline-flex; align-items: center; gap: 7px; }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+      color: var(--ink-soft); padding: 0; transition: color 0.2s;
+    }
+    .lang-btn[aria-pressed="true"] { color: var(--ink); }
+    .lang-btn:hover { color: var(--or); }
+    .lang-sep { color: var(--line); font-family: var(--mono); font-size: 12px; }
+
+    .nav-cta {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink); border: 0.5px solid var(--ink);
+      padding: 10px 18px; transition: background 0.25s, color 0.25s;
+    }
+    .nav-cta:hover { background: var(--ink); color: var(--paper); }
+
+    .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; }
+    .burger span { width: 24px; height: 1.5px; background: var(--ink); transition: transform 0.3s, opacity 0.3s; }
+    body.menu-open .burger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    body.menu-open .burger span:nth-child(2) { opacity: 0; }
+    body.menu-open .burger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-menu {
+      position: fixed; inset: 0; z-index: 90; background: var(--paper);
+      display: flex; flex-direction: column; justify-content: center; padding: var(--pad-x);
+      transform: translateX(100%); transition: transform 0.4s ease;
+    }
+    body.menu-open .mobile-menu { transform: translateX(0); }
+    .mobile-menu a { font-family: var(--serif); font-size: 40px; font-weight: 300; padding: 14px 0; border-bottom: 0.5px solid var(--line); }
+    .mobile-menu a:last-child { border-bottom: none; color: var(--or); }
+
+    /* ═══ 4 · HERO ═════════════════════════════════════════ */
+    .hero { position: relative; min-height: 100vh; display: grid; grid-template-columns: 1.05fr 0.95fr; }
+    .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 120px var(--pad-x) 80px; }
+    .hero-dateline { margin-bottom: 32px; }
+    .hero-title {
+      font-family: var(--serif); font-size: clamp(48px, 6.4vw, 96px);
+      font-weight: 300; line-height: 1.04; letter-spacing: -0.015em; margin-bottom: 36px;
+    }
+    .hero-title em { font-style: italic; color: var(--or); }
+
+    .line { display: block; overflow: hidden; }
+    .line > span { display: block; }
+    html.js .line > span { transform: translateY(110%); transition: transform 0.9s cubic-bezier(.16,1,.3,1); }
+    html.js body.loaded .line:nth-child(1) > span { transform: none; transition-delay: 0.15s; }
+    html.js body.loaded .line:nth-child(2) > span { transform: none; transition-delay: 0.27s; }
+    html.js body.loaded .line:nth-child(3) > span { transform: none; transition-delay: 0.39s; }
+
+    .hero-lede { font-size: 15px; font-weight: 300; color: var(--ink-soft); max-width: 430px; line-height: 1.8; margin-bottom: 0; }
+    html.js .hero-lede, html.js .hero-dateline, html.js .hero-scroll {
+      opacity: 0; transform: translateY(16px); transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    html.js body.loaded .hero-lede     { opacity: 1; transform: none; transition-delay: 0.6s; }
+    html.js body.loaded .hero-dateline { opacity: 1; transform: none; transition-delay: 0.5s; }
+    html.js body.loaded .hero-scroll   { opacity: 1; transform: none; transition-delay: 0.8s; }
+
+    .hero-scroll {
+      margin-top: 56px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 10px;
+    }
+    .hero-scroll .arrow { display: inline-block; animation: bob 1.8s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+    .hero-right { position: relative; overflow: hidden; background: var(--paper-2); }
+    .hero-right img { width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: grayscale(18%); }
+    .hero-credit { position: absolute; bottom: 22px; right: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: rgba(255,255,255,0.72); }
+
+    .spine {
+      position: absolute; left: 22px; bottom: 110px; z-index: 5;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink-soft); writing-mode: vertical-rl; transform: rotate(180deg);
+    }
+
+    /* ═══ 5 · SECTIONS ═════════════════════════════════════ */
+    section { padding: var(--pad-y) var(--pad-x); }
+    .section-head { margin-bottom: clamp(48px, 6vw, 80px); }
+    .section-title {
+      font-family: var(--serif); font-size: clamp(32px, 4.4vw, 60px);
+      font-weight: 300; line-height: 1.12; letter-spacing: -0.01em; margin-top: 18px;
+    }
+    html.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    html.js .reveal.in { opacity: 1; transform: none; }
+
+    /* ═══ 6 · SERVICES ═════════════════════════════════════ */
+    #services { background: var(--ink); color: var(--paper); }
+    #services .section-title { color: var(--paper); }
+    #services .eyebrow { color: var(--or); }
+    .services-list { border-top: 0.5px solid rgba(250,248,243,0.14); }
+    .service {
+      display: grid; grid-template-columns: 90px 1fr auto; align-items: start; gap: 40px;
+      padding: 34px 0; border-bottom: 0.5px solid rgba(250,248,243,0.14);
+      transition: padding-left 0.35s ease, background 0.35s ease;
+    }
+    .service:hover { padding-left: 20px; background: rgba(250,248,243,0.03); }
+    .service-num { font-family: var(--mono); font-size: 13px; font-weight: 300; color: var(--or); letter-spacing: 0.04em; padding-top: 8px; }
+    .service-name { font-family: var(--serif); font-size: clamp(24px, 3vw, 32px); font-weight: 300; color: var(--paper); margin-bottom: 12px; transition: color 0.25s; }
+    .service:hover .service-name { color: var(--or); }
+    .service-desc { font-size: 14px; font-weight: 300; color: rgba(250,248,243,0.55); max-width: 580px; line-height: 1.75; }
+    .service-arrow { font-family: var(--mono); font-size: 18px; color: rgba(250,248,243,0.22); padding-top: 8px; transition: color 0.25s, transform 0.35s ease; }
+    .service:hover .service-arrow { color: var(--or); transform: translateX(6px); }
+    .service:nth-child(2).in { transition-delay: 0.05s; }
+    .service:nth-child(3).in { transition-delay: 0.10s; }
+    .service:nth-child(4).in { transition-delay: 0.15s; }
+    .service:nth-child(5).in { transition-delay: 0.20s; }
+
+    /* ═══ 7 · RÉFÉRENCES ═══════════════════════════════════ */
+    #references { background: var(--paper); }
+    .refs-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 48px; margin-bottom: clamp(48px, 6vw, 80px); }
+    .refs-quote { font-family: var(--serif); font-size: 19px; font-style: italic; font-weight: 300; color: var(--ink-soft); max-width: 380px; line-height: 1.6; }
+    .refs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .ref { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--paper-2); }
+    .ref img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(45%); transition: transform 0.7s cubic-bezier(.16,1,.3,1), filter 0.6s ease; }
+    .ref:hover img { transform: scale(1.05); filter: grayscale(0%); }
+    .ref-cap {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(21,19,14,0.72) 0%, rgba(21,19,14,0) 55%);
+      opacity: 0; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: flex-end; padding: 22px;
+    }
+    .ref:hover .ref-cap { opacity: 1; }
+    .ref-num { font-family: var(--mono); font-size: 11px; color: var(--or); margin-bottom: 6px; letter-spacing: 0.06em; }
+    .ref-name { font-family: var(--serif); font-size: 22px; font-weight: 300; color: #fff; }
+    .ref:nth-child(2).in { transition-delay: 0.06s; }
+    .ref:nth-child(3).in { transition-delay: 0.12s; }
+    .ref:nth-child(4).in { transition-delay: 0.06s; }
+    .ref:nth-child(5).in { transition-delay: 0.12s; }
+    .ref:nth-child(6).in { transition-delay: 0.18s; }
+
+    /* ═══ 8 · LOGOS ════════════════════════════════════════ */
+    #clients { padding: 64px 0; background: var(--paper-2); overflow: hidden; }
+    .clients-label { text-align: center; margin-bottom: 40px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+    .marquee {
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+              mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .marquee-track { display: flex; width: max-content; animation: scroll-x 36s linear infinite; }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .logo { padding: 0 50px; white-space: nowrap; font-family: var(--serif); font-size: 23px; font-weight: 300; letter-spacing: 0.03em; color: var(--ink-soft); border-right: 0.5px solid var(--line); transition: color 0.2s; }
+    .logo:hover { color: var(--ink); }
+
+    /* ═══ 9 · CONTACT ══════════════════════════════════════ */
+    #contact { background: var(--ink); color: var(--paper); padding: var(--pad-y) var(--pad-x) 56px; }
+    .contact-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding-bottom: 72px; border-bottom: 0.5px solid rgba(250,248,243,0.14); margin-bottom: 48px; }
+    .contact-cta { font-family: var(--serif); font-size: clamp(36px, 4.4vw, 64px); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 36px; }
+    .contact-cta em { font-style: italic; color: var(--or); }
+    .contact-email { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 300; color: var(--paper); border-bottom: 1px solid var(--or); padding-bottom: 4px; transition: gap 0.25s; }
+    .contact-email:hover { gap: 16px; }
+    .contact-social { margin-top: 32px; display: flex; gap: 24px; }
+    .contact-social a { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(250,248,243,0.5); transition: color 0.2s; }
+    .contact-social a:hover { color: var(--or); }
+    .form-title { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--or); margin-bottom: 28px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(250,248,243,0.62); margin-bottom: 8px; }
+    .field input, .field textarea {
+      width: 100%; background: transparent; border: none; border-bottom: 0.5px solid rgba(250,248,243,0.22);
+      color: var(--paper); font-family: var(--sans); font-size: 14px; font-weight: 300; padding: 10px 0; outline: none; transition: border-color 0.25s;
+    }
+    .field input::placeholder, .field textarea::placeholder { color: rgba(250,248,243,0.28); }
+    .field input:focus, .field textarea:focus { border-color: var(--or); }
+    .field textarea { resize: none; height: 84px; }
+    .btn {
+      margin-top: 24px; display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--paper); background: transparent; border: 0.5px solid rgba(250,248,243,0.3);
+      padding: 15px 34px; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .btn:hover { background: var(--or); border-color: var(--or); color: var(--ink); }
+    .form-merci { font-family: var(--serif); font-size: 22px; font-weight: 300; font-style: italic; color: var(--paper); padding: 20px 0; }
+    .contact-bottom { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .contact-logo { font-family: var(--serif); font-size: 16px; color: rgba(250,248,243,0.45); }
+    .contact-legal { display: flex; gap: 28px; list-style: none; }
+    .contact-legal a { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: rgba(250,248,243,0.45); transition: color 0.2s; }
+    .contact-legal a:hover { color: var(--paper); }
+
+    /* ═══ 10 · RESPONSIVE ══════════════════════════════════ */
+    @media (max-width: 900px) {
+      .nav-links, .nav-cta { display: none; }
+      .burger { display: flex; }
+      .nav-right { gap: 14px; }
+
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 104px var(--pad-x) 56px; }
+      .hero-right { height: 52vh; }
+      .hero-title { font-size: clamp(40px, 9vw, 60px); }
+      .spine { display: none; }
+
+      .service { grid-template-columns: 1fr; gap: 8px; padding-left: 0; }
+      .service:hover { padding-left: 0; }
+      .service-num, .service-arrow { display: none; }
+
+      .refs-head { flex-direction: column; align-items: flex-start; }
+      .refs-grid { grid-template-columns: 1fr 1fr; }
+
+      .contact-top { grid-template-columns: 1fr; gap: 56px; }
+      .contact-bottom { flex-direction: column; align-items: flex-start; gap: 20px; }
+
+      .field input, .field textarea { font-size: 16px; }
+    }
+
+    @media (hover: none) {
+      .ref-cap { opacity: 1; background: linear-gradient(to top, rgba(21,19,14,0.78) 0%, rgba(21,19,14,0) 52%); }
+      .ref img { filter: grayscale(0%); }
+    }
+
+    @media (max-width: 540px) {
+      section { padding: 72px var(--pad-x); }
+      .hero-left { padding: 96px var(--pad-x) 48px; }
+      .hero-title { font-size: 38px; line-height: 1.08; }
+      .hero-right { height: 46vh; }
+      .refs-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      html.js .reveal, html.js .line > span, html.js .hero-lede,
+      html.js .hero-dateline, html.js .hero-scroll { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip" data-i18n="skip">Skip to content</a>
+
+  <!-- ═══ NAVBAR ══════════════════════════════════════════ -->
+  <nav class="nav" id="nav">
+    <a href="#top" class="nav-logo">Cédric Galonské</a>
+    <ul class="nav-links">
+      <li><a href="#services" data-i18n="nav.services">Services</a></li>
+      <li><a href="#references" data-i18n="nav.references">References</a></li>
+      <li><a href="#clients" data-i18n="nav.clients">Clients</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang-toggle" role="group" aria-label="Language / Langue">
+        <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+        <span class="lang-sep">/</span>
+        <button type="button" class="lang-btn" data-lang="fr" aria-pressed="false">FR</button>
+      </div>
+      <a href="#contact" class="nav-cta" data-i18n="nav.contact">Contact</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu mobile plein écran -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#services" data-i18n="nav.services">Services</a>
+    <a href="#references" data-i18n="nav.references">References</a>
+    <a href="#clients" data-i18n="nav.clients">Clients</a>
+    <a href="#contact" data-i18n="nav.contact">Contact</a>
+  </div>
+
+
+  <!-- ═══ HERO ════════════════════════════════════════════ -->
+  <main id="main">
+
+  <section class="hero" id="top">
+    <span class="spine">PR &amp; Communication — Paris</span>
+
+    <div class="hero-left">
+      <span class="eyebrow hero-dateline" data-i18n="hero.dateline">2026 Edition — Paris, France</span>
+
+      <h1 class="hero-title">
+        <span class="line"><span data-i18n="hero.l1">Shaping</span></span>
+        <span class="line"><span data-i18n="hero.l2">the image of</span></span>
+        <span class="line"><span data-i18n="hero.l3">your <em>Maisons.</em></span></span>
+      </h1>
+
+      <p class="hero-lede" data-i18n="hero.lede">
+        A PR and communication specialist, I support luxury, beauty,
+        lifestyle and art brands in building an authentic and lasting image.
+      </p>
+
+      <a href="#services" class="hero-scroll">
+        <span class="arrow">↓</span> <span data-i18n="hero.scroll">Discover</span>
+      </a>
+    </div>
+
+    <div class="hero-right">
+      <!-- ⚠️ Remplace cette URL par la photo hébergée sur Netlify -->
+      <img
+        src="https://cedricgalonske.com/wp-content/uploads/2025/02/Cedric-Galonske-876x1024.jpg"
+        alt="Cédric Galonské portrait"
+        decoding="async">
+      <span class="hero-credit">Photo — David Atlan</span>
+    </div>
+  </section>
+
+
+  <!-- ═══ SERVICES ════════════════════════════════════════ -->
+  <section id="services">
+    <div class="section-head reveal">
+      <span class="eyebrow" data-i18n="services.eyebrow">Expertise</span>
+      <h2 class="section-title" data-i18n="services.title">Five areas of expertise,<br>one vision.</h2>
+    </div>
+
+    <div class="services-list">
+
+      <div class="service reveal">
+        <span class="service-num">N°01</span>
+        <div>
+          <p class="service-name">Consulting</p>
+          <p class="service-desc" data-i18n="svc1.desc">
+            Tailor-made strategies for market entries or ongoing PR programs,
+            in perfect alignment with your objectives.
+          </p>
+        </div>
+        <span class="service-arrow">→</span>
+      </div>
+
+      <div class="service reveal">
+        <span class="service-num">N°02</span>
+        <div>
+          <p class="service-name">PR Relations</p>
+          <p class="service-desc" data-i18n="svc2.desc">
+            Comprehensive promotion of your brand: interviews, profiles,
+            articles and editorial placements, both online and offline.
+          </p>
+        </div>
+        <span class="service-arrow">→</span>
+      </div>
+
+      <div class="service reveal">
+        <span class="service-num">N°03</span>
+        <div>
+          <p class="service-name">Brand Events</p>
+          <p class="service-desc" data-i18n="svc3.desc">
+            Design and delivery of bespoke events: press presentations,
+            exclusive dinners and press trips crafted to engage.
+          </p>
+        </div>
+        <span class="service-arrow">→</span>
+      </div>
+
+      <div class="service reveal">
+        <span class="service-num">N°04</span>
+        <div>
+          <p class="service-name">Branding</p>
+          <p class="service-desc" data-i18n="svc4.desc">
+            Creation of premium brand content, with a trusted network of
+            professionals, for high-impact assets.
+          </p>
+        </div>
+        <span class="service-arrow">→</span>
+      </div>
+
+      <div class="service reveal">
+        <span class="service-num">N°05</span>
+        <div>
+          <p class="service-name">Special Projects</p>
+          <p class="service-desc" data-i18n="svc5.desc">
+            Strategic partnerships, co-brandings and special projects,
+            connected to industry leaders for maximum visibility.
+          </p>
+        </div>
+        <span class="service-arrow">→</span>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ═══ RÉFÉRENCES ══════════════════════════════════════ -->
+  <section id="references">
+    <div class="refs-head reveal">
+      <div>
+        <span class="eyebrow" data-i18n="refs.eyebrow">Collaborations</span>
+        <h2 class="section-title" data-i18n="refs.title">Brands that<br>place their trust.</h2>
+      </div>
+      <p class="refs-quote" data-i18n="refs.quote">
+        "A selection of maisons I have had the pleasure of working with,
+        each enriching the journey in its own way."
+      </p>
+    </div>
+
+    <div class="refs-grid">
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/02/Brume_Orpin-collection_lifestyle@nathaliebaetens-2-edited-scaled.jpg" alt="Brume Orpin" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°01</span><span class="ref-name">Brume Orpin</span></figcaption>
+      </figure>
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/02/Cris_Porto-Ligne_Candy-1-1-edited-scaled.jpg" alt="Cris Porto" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°02</span><span class="ref-name">Cris Porto</span></figcaption>
+      </figure>
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/02/French-Bloom_Lifestyle1-edited.jpg" alt="French Bloom" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°03</span><span class="ref-name">French Bloom</span></figcaption>
+      </figure>
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/02/Jacques_Cartier-Collection-2025-@JulienGolzan-1-1-1024x1024.jpg" alt="Jacques Cartier" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°04</span><span class="ref-name">Jacques Cartier</span></figcaption>
+      </figure>
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/10/Claude_Preval-Campaign-5-1-1-scaled.jpg" alt="Claude Préval" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°05</span><span class="ref-name">Claude Préval</span></figcaption>
+      </figure>
+      <figure class="ref reveal">
+        <img src="https://cedricgalonske.com/wp-content/uploads/2025/02/MAY_Collection_Lordesfous_visuels_ambiance-2-2-edited-scaled.jpeg" alt="MAY" loading="lazy" decoding="async">
+        <figcaption class="ref-cap"><span class="ref-num">N°06</span><span class="ref-name">MAY</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+
+  <!-- ═══ LOGOS DÉFILANTS ══════════════════════════════════ -->
+  <div id="clients">
+    <p class="clients-label" data-i18n="clients.label">They trust me</p>
+    <div class="marquee">
+      <div class="marquee-track" aria-hidden="true">
+        <span class="logo">Brume Orpin</span>
+        <span class="logo">Cris Porto</span>
+        <span class="logo">French Bloom</span>
+        <span class="logo">Jacques Cartier</span>
+        <span class="logo">Claude Préval</span>
+        <span class="logo">MAY</span>
+        <span class="logo">Coltesse</span>
+        <span class="logo">La Reine Capricieuse</span>
+        <span class="logo">Brume Orpin</span>
+        <span class="logo">Cris Porto</span>
+        <span class="logo">French Bloom</span>
+        <span class="logo">Jacques Cartier</span>
+        <span class="logo">Claude Préval</span>
+        <span class="logo">MAY</span>
+        <span class="logo">Coltesse</span>
+        <span class="logo">La Reine Capricieuse</span>
+      </div>
+    </div>
+  </div>
+
+  </main>
+
+  <!-- ═══ CONTACT ══════════════════════════════════════════ -->
+  <footer id="contact">
+    <div class="contact-top">
+
+      <div class="reveal">
+        <p class="contact-cta" data-i18n="contact.cta">Let's work<br><em>together.</em></p>
+        <a href="mailto:contact@cedricgalonske.com" class="contact-email">
+          contact@cedricgalonske.com →
+        </a>
+        <div class="contact-social">
+          <a href="https://www.linkedin.com/in/cédric-galonské-51ab9344/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://www.instagram.com/cedricglnsk/" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p class="form-title" data-i18n="form.title">Send a message</p>
+        <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="contact">
+          <p hidden aria-hidden="true"><label>Do not fill: <input name="bot-field"></label></p>
+          <div class="field">
+            <label for="nom" data-i18n="form.name">Your name</label>
+            <input type="text" id="nom" name="nom" placeholder="Marie Dupont" data-i18n-ph="form.name.ph" required>
+          </div>
+          <div class="field">
+            <label for="email" data-i18n="form.email">Email</label>
+            <input type="email" id="email" name="email" placeholder="marie@maison.com" data-i18n-ph="form.email.ph" required>
+          </div>
+          <div class="field">
+            <label for="message" data-i18n="form.message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell me about your project…" data-i18n-ph="form.message.ph" required></textarea>
+          </div>
+          <button class="btn" type="submit" data-i18n="form.submit">Send →</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="contact-bottom">
+      <span class="contact-logo">Cédric Galonské — Communication &amp; Image</span>
+      <ul class="contact-legal">
+        <li><a href="mentions-legales.html" data-i18n="footer.legal1">Legal notice</a></li>
+        <li><a href="confidentialite.html" data-i18n="footer.legal2">Privacy</a></li>
+      </ul>
+    </div>
+  </footer>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════════════ -->
+  <script>
+    document.documentElement.classList.add('js');
+
+    /* ═══ BILINGUE — EN (défaut) / FR ═══════════════════════
+       Tout le texte traduisible porte un attribut data-i18n.
+       Le bouton EN/FR change la langue sans recharger la page.
+       Le choix est mémorisé localement (préférence fonctionnelle).
+    ═══════════════════════════════════════════════════════ */
+    const I18N = {
+      en: {
+        'skip': 'Skip to content',
+        'nav.services': 'Services',
+        'nav.references': 'References',
+        'nav.clients': 'Clients',
+        'nav.contact': 'Contact',
+        'hero.dateline': '2026 Edition — Paris, France',
+        'hero.l1': 'Shaping',
+        'hero.l2': 'the image of',
+        'hero.l3': 'your <em>Maisons.</em>',
+        'hero.lede': 'A PR and communication specialist, I support luxury, beauty, lifestyle and art brands in building an authentic and lasting image.',
+        'hero.scroll': 'Discover',
+        'services.eyebrow': 'Expertise',
+        'services.title': 'Five areas of expertise,<br>one vision.',
+        'svc1.desc': 'Tailor-made strategies for market entries or ongoing PR programs, in perfect alignment with your objectives.',
+        'svc2.desc': 'Comprehensive promotion of your brand: interviews, profiles, articles and editorial placements, both online and offline.',
+        'svc3.desc': 'Design and delivery of bespoke events: press presentations, exclusive dinners and press trips crafted to engage.',
+        'svc4.desc': 'Creation of premium brand content, with a trusted network of professionals, for high-impact assets.',
+        'svc5.desc': 'Strategic partnerships, co-brandings and special projects, connected to industry leaders for maximum visibility.',
+        'refs.eyebrow': 'Collaborations',
+        'refs.title': 'Brands that<br>place their trust.',
+        'refs.quote': '"A selection of maisons I have had the pleasure of working with, each enriching the journey in its own way."',
+        'clients.label': 'They trust me',
+        'contact.cta': "Let's work<br><em>together.</em>",
+        'form.title': 'Send a message',
+        'form.name': 'Your name',
+        'form.name.ph': 'Marie Dupont',
+        'form.email': 'Email',
+        'form.email.ph': 'marie@maison.com',
+        'form.message': 'Message',
+        'form.message.ph': 'Tell me about your project…',
+        'form.submit': 'Send →',
+        'form.thanks': 'Thank you. I will get back to you very soon.',
+        'form.error': 'Something went wrong. Please email me directly.',
+        'footer.legal1': 'Legal notice',
+        'footer.legal2': 'Privacy'
+      },
+      fr: {
+        'skip': 'Aller au contenu',
+        'nav.services': 'Services',
+        'nav.references': 'Références',
+        'nav.clients': 'Clients',
+        'nav.contact': 'Contact',
+        'hero.dateline': 'Édition 2026 — Paris, France',
+        'hero.l1': 'Façonner',
+        'hero.l2': "l'image de vos",
+        'hero.l3': '<em>Maisons.</em>',
+        'hero.lede': "Spécialiste en relations presse et communication, j'accompagne les marques du luxe, de la beauté, du lifestyle et de l'art dans la construction d'une image authentique et durable.",
+        'hero.scroll': 'Découvrir',
+        'services.eyebrow': 'Expertises',
+        'services.title': 'Cinq expertises,<br>une seule vision.',
+        'svc1.desc': 'Stratégies sur-mesure pour les introductions marché ou les programmes PR continus, en parfaite cohérence avec vos objectifs.',
+        'svc2.desc': 'Promotion globale de votre marque : interviews, portraits, articles et placements éditoriaux, en ligne comme hors-ligne.',
+        'svc3.desc': "Conception et exécution d'événements sur-mesure : présentations presse, dîners exclusifs et press trips pensés pour engager.",
+        'svc4.desc': 'Création de contenus de marque premium, avec un réseau de professionnels de confiance, pour des assets à fort impact.',
+        'svc5.desc': 'Partenariats stratégiques, co-brandings et projets spéciaux, connectés aux leaders du secteur pour un rayonnement maximal.',
+        'refs.eyebrow': 'Collaborations',
+        'refs.title': 'Des marques qui<br>font confiance.',
+        'refs.quote': "\"Une sélection de maisons avec lesquelles j'ai eu le plaisir de collaborer, chacune enrichissant le parcours à sa façon.\"",
+        'clients.label': 'Ils me font confiance',
+        'contact.cta': 'Travaillons<br><em>ensemble.</em>',
+        'form.title': 'Envoyer un message',
+        'form.name': 'Votre nom',
+        'form.name.ph': 'Marie Dupont',
+        'form.email': 'Email',
+        'form.email.ph': 'marie@maison.com',
+        'form.message': 'Message',
+        'form.message.ph': 'Votre projet en quelques mots…',
+        'form.submit': 'Envoyer →',
+        'form.thanks': 'Merci. Je reviens vers vous très vite.',
+        'form.error': 'Une erreur est survenue. Écrivez-moi directement par email.',
+        'footer.legal1': 'Mentions légales',
+        'footer.legal2': 'Confidentialité'
+      }
+    };
+
+    let currentLang = 'en';
+
+    function applyLang(lang) {
+      const dict = I18N[lang];
+      if (!dict) return;
+      currentLang = lang;
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = dict[el.getAttribute('data-i18n')];
+        if (v == null) return;
+        if (v.indexOf('<') !== -1) el.innerHTML = v;
+        else el.textContent = v;
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const v = dict[el.getAttribute('data-i18n-ph')];
+        if (v != null) el.setAttribute('placeholder', v);
+      });
+      if (dict['meta.title']) document.title = dict['meta.title'];
+
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false');
+      });
+    }
+
+    function setLang(lang) {
+      try { localStorage.setItem('galonske_lang', lang); } catch (e) {}
+      applyLang(lang);
+    }
+
+    // Langue initiale : préférence mémorisée, sinon anglais par défaut
+    (function () {
+      let saved = null;
+      try { saved = localStorage.getItem('galonske_lang'); } catch (e) {}
+      applyLang(saved === 'fr' ? 'fr' : 'en');
+    })();
+
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.addEventListener('click', () => setLang(b.dataset.lang));
+    });
+
+    /* ═══ Révélation du hero au chargement ══════════════════ */
+    window.addEventListener('load', () => document.body.classList.add('loaded'));
+    setTimeout(() => document.body.classList.add('loaded'), 600);
+
+    /* ═══ Navbar : opaque après 40px de scroll ══════════════ */
+    const nav = document.getElementById('nav');
+    addEventListener('scroll', () => {
+      nav.classList.toggle('nav--solid', window.scrollY > 40);
+    }, { passive: true });
+
+    /* ═══ Menu mobile ═══════════════════════════════════════ */
+    const burger = document.getElementById('burger');
+    const closeMenu = () => {
+      document.body.classList.remove('menu-open');
+      burger.setAttribute('aria-expanded', 'false');
+    };
+    burger.addEventListener('click', () => {
+      const open = document.body.classList.toggle('menu-open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.querySelectorAll('#mobileMenu a').forEach(a => a.addEventListener('click', closeMenu));
+    addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+    /* ═══ Apparition au scroll ══════════════════════════════ */
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    /* ═══ Formulaire → Netlify Forms (avec message bilingue) ═ */
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const data = new URLSearchParams(new FormData(form)).toString();
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data
+      })
+      .then(() => {
+        form.innerHTML = '<p class="form-merci">' + I18N[currentLang]['form.thanks'] + '</p>';
+      })
+      .catch(() => {
+        form.innerHTML = '<p class="form-merci">' + I18N[currentLang]['form.error'] + '</p>';
+      });
+    });
+  </script>
+
+</body>
+</html>
